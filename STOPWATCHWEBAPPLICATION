@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stopwatch</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-image: url('swbg.jpg'); 
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .container
+    {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      left: 25%; /* Adjust left position */
+      top: 50%;
+      width: min(90%, 31.25em);
+      padding: 3.75em 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #stopwatch {
+      font-size: 2em;
+      margin-right: 10px; 
+      margin-bottom: 10px;
+    }
+ 
+    #buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    #lapTimes {
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+
+ <div class="container">
+    <div id="stopwatch">00:00:00:000</div>
+        <div id="buttons">
+        <button onclick="startStopwatch()">Start</button>
+        <button onclick="stopStopwatch()">Stop</button>
+        <button onclick="resetStopwatch()">Reset</button>
+        <button onclick="recordLap()">Lap</button>
+        </div>
+    <ul id="lapTimes"></ul>
+ </div>
+</body>
+<script>
+  let startTime;
+  let running = false;
+  let lapTimes = [];
+
+  function startStopwatch() {
+    if (!running) {
+      startTime = Date.now();
+      running = true;
+      updateStopwatch();
+    }
+  }
+
+  function stopStopwatch() {
+    if (running) {
+      running = false;
+    }
+  }
+
+  function resetStopwatch() {
+    stopStopwatch();
+    document.getElementById('stopwatch').textContent = '00:00:00:000';
+    lapTimes = [];
+    updateLapTimes();
+  }
+
+  function recordLap() {
+    if (running) {
+      const currentTime = Date.now();
+      const elapsedTime = new Date(currentTime - startTime);
+      const lapTime = `${elapsedTime.getUTCHours().toString().padStart(2, '0')}:${elapsedTime.getUTCMinutes().toString().padStart(2, '0')}:${elapsedTime.getUTCSeconds().toString().padStart(2, '0')}:${elapsedTime.getUTCMilliseconds().toString().padStart(3, '0')}`;
+
+      lapTimes.push(lapTime);
+      updateLapTimes();
+    }
+  }
+
+  function updateStopwatch() {
+    if (running) {
+      const currentTime = Date.now();
+      const elapsedTime = new Date(currentTime - startTime);
+      const hours = elapsedTime.getUTCHours().toString().padStart(2, '0');
+      const minutes = elapsedTime.getUTCMinutes().toString().padStart(2, '0');
+      const seconds = elapsedTime.getUTCSeconds().toString().padStart(2, '0');
+      const milliseconds = elapsedTime.getUTCMilliseconds().toString().padStart(3, '0');
+
+      document.getElementById('stopwatch').textContent = `${hours}:${minutes}:${seconds}:${milliseconds}`;
+
+      setTimeout(updateStopwatch, 10); // Update every 10 milliseconds for smoother display
+    }
+  }
+
+  function updateLapTimes() {
+    const lapTimesList = document.getElementById('lapTimes');
+    lapTimesList.innerHTML = ''; // Clear existing lap times
+
+    lapTimes.forEach((lapTime, index) => {
+      const lapItem = document.createElement('li');
+      lapItem.textContent = `Lap ${index + 1}: ${lapTime}`;
+      lapTimesList.appendChild(lapItem);
+    });
+  }
+
+  document.addEventListener('contextmenu', function (event) {
+    event.preventDefault();
+    resetStopwatch();
+  });
+</script>
+
+</body>
+</html>
